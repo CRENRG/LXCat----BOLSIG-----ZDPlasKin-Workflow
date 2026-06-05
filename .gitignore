@@ -1,0 +1,9 @@
+﻿.venv/
+__pycache__/
+*.pyc
+*.log
+dashboard/streamlit*.log
+data/bolsig_outputs/
+data/zdplaskin_outputs/
+data/lxcat/Cross_section_process_summary.csv
+plots/
