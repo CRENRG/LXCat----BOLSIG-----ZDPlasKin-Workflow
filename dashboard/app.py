@@ -71,6 +71,29 @@ def inject_css():
     st.markdown(
         """
 <style>
+    :root {
+        color-scheme: light;
+    }
+    html, body, .stApp, [data-testid="stAppViewContainer"] {
+        background: #f6f8fb;
+        color: #0f172a;
+    }
+    [data-testid="stMarkdownContainer"],
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stMarkdownContainer"] h3,
+    [data-testid="stMarkdownContainer"] h4,
+    [data-testid="stMarkdownContainer"] h5,
+    [data-testid="stMarkdownContainer"] h6,
+    [data-testid="stWidgetLabel"],
+    [data-testid="stWidgetLabel"] label,
+    [data-testid="stCaptionContainer"],
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] p {
+        color: #0f172a;
+    }
     .stApp {
         background: #f6f8fb;
         color: #17202a;
