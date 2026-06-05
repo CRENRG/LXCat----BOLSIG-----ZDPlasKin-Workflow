@@ -1,7 +1,36 @@
 import argparse
+import re
 from pathlib import Path
 
 import pandas as pd
+
+
+def _parse_embedded_numeric_table(output_file):
+    lines = output_file.read_text(encoding='utf-8', errors='ignore').splitlines()
+    header = None
+    rows = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        parts = re.split(r'\s+', stripped)
+        if header is None:
+            if parts and parts[0].lower() in ('time_s', 'time', 't'):
+                header = parts
+            continue
+        try:
+            values = [float(part) for part in parts]
+        except ValueError:
+            if rows:
+                break
+            continue
+        if len(values) == len(header):
+            rows.append(values)
+        elif rows:
+            break
+    if header and rows:
+        return pd.DataFrame(rows, columns=header)
+    return None
 
 
 def parse_zdplaskin_output(output_file):
@@ -9,14 +38,18 @@ def parse_zdplaskin_output(output_file):
     if not output_file.exists():
         raise FileNotFoundError(f'ZDPlasKin output file not found: {output_file}')
 
-    try:
-        df = pd.read_csv(output_file, comment='#', delim_whitespace=True)
-    except Exception:
-        text = output_file.read_text(encoding='utf-8', errors='ignore').splitlines()
-        rows = [line.strip() for line in text if line.strip() and not line.strip().startswith('#')]
-        if not rows:
-            raise ValueError('Unable to read ZDPlasKin output file or file is empty.')
-        df = pd.read_csv(output_file, comment='#', delim_whitespace=True, header=None)
+    embedded = _parse_embedded_numeric_table(output_file)
+    if embedded is not None:
+        df = embedded
+    else:
+        try:
+            df = pd.read_csv(output_file, comment='#', sep=r'\s+')
+        except Exception:
+            text = output_file.read_text(encoding='utf-8', errors='ignore').splitlines()
+            rows = [line.strip() for line in text if line.strip() and not line.strip().startswith('#')]
+            if not rows:
+                raise ValueError('Unable to read ZDPlasKin output file or file is empty.')
+            df = pd.read_csv(output_file, comment='#', sep=r'\s+', header=None)
 
     species_columns = [col for col in df.columns if any(name in str(col).lower() for name in ('electron', 'e-', 'd2+', 'd3+', 'd2', 'd+', 'd'))]
     time_column = None

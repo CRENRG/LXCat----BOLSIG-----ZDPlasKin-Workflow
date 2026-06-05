@@ -6,6 +6,13 @@ This workspace contains a local Streamlit dashboard for presenting the workflow:
 
 The dashboard is designed to work immediately as a polished demo using an LXCat `.txt` file. When BOLSIG+ or ZDPlasKin executable paths are not configured, the app generates clearly labeled `demo output until executable paths are configured` data so the full workflow can still be presented.
 
+## Links
+
+- Presentation link for PowerPoint: https://crenrg.github.io/LXCat----BOLSIG-----ZDPlasKin-Workflow/
+- Local executable runner on this laptop: http://localhost:8503
+
+Use the presentation link in slides. Use the local runner link only when this laptop is on and the Streamlit runner is open.
+
 ## Install
 
 From this repository root:
@@ -33,6 +40,7 @@ Streamlit will print a local URL, usually `http://localhost:8501`.
 ## Folder Structure
 
 - `dashboard/app.py` - the presentation-ready Streamlit dashboard.
+- `dashboard/workflow_runner.py` - local dashboard that runs the available BOLSIG+ and ZDPlasKin executables.
 - `data/lxcat/` - LXCat `.txt` cross-section files. The attached `Cross section.txt` should live here.
 - `data/bolsig_inputs/` - generated or copied inputs for configured BOLSIG+ runs.
 - `data/bolsig_outputs/` - demo or parsed BOLSIG+ EEDF, transport, and rate CSV outputs.
@@ -44,6 +52,7 @@ Streamlit will print a local URL, usually `http://localhost:8501`.
 - `scripts/parse_bolsig_output.py` - parser for real BOLSIG+ text output.
 - `scripts/demo_zdplaskin_outputs.py` - generates clearly labeled demo species-density evolution.
 - `scripts/parse_zdplaskin_output.py` - parser for real ZDPlasKin tabular output.
+- `scripts/build_static_presentation.py` - builds the static GitHub Pages presentation dashboard.
 
 ## LXCat Files
 

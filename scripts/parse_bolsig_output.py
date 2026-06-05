@@ -13,17 +13,42 @@ def parse_bolsig_output(output_path):
         raise FileNotFoundError(f'BOLSIG+ output file not found: {output_path}')
 
     raw = output_path.read_text(encoding='utf-8', errors='ignore').splitlines()
-    sections = {'summary': [], 'eedf': []}
     eedf_mode = False
     eedf_rows = []
     coefficients = []
     transport = []
     summary = []
+    current_process = None
 
-    for line in raw:
+    for idx, line in enumerate(raw):
         text = line.strip()
         if not text:
             eedf_mode = False
+            continue
+
+        process_match = re.match(r'^(C\d+)\s+(.+)$', text)
+        if process_match and 'Input cross section' not in text:
+            current_process = re.sub(r'\s+', ' ', text).strip()
+            continue
+
+        if text.startswith('E/N (Td)') and idx + 1 < len(raw):
+            name = text.split('\t', 1)[1].strip() if '\t' in text else text.replace('E/N (Td)', '').strip()
+            next_text = raw[idx + 1].strip()
+            parts = re.split(r'\s+', next_text)
+            if len(parts) >= 2:
+                try:
+                    value = float(parts[1])
+                except ValueError:
+                    value = None
+                if value is not None:
+                    entry = {'parameter': name, 'value': value, 'reduced_field_td': float(parts[0])}
+                    if 'rate coefficient' in name.lower():
+                        entry['process'] = current_process or 'Unspecified process'
+                        coefficients.append(entry)
+                    elif any(token in name.lower() for token in ('mean energy', 'mobility', 'diffusion', 'drift', 'frequency', 'power', 'maximum energy')):
+                        transport.append(entry)
+                    else:
+                        summary.append({'name': name, 'value': value})
             continue
 
         if 'EEDF' in text.upper() or 'DISTRIBUTION' in text.upper():
